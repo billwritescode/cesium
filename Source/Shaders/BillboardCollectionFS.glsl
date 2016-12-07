@@ -15,13 +15,28 @@ void main()
 #else
     vec4 vertexColor = v_color;
 #endif
-    
+
     vec4 color = texture2D(u_atlas, v_textureCoordinates) * vertexColor;
-    if (color.a == 0.0)
+
+#ifdef RENDER_FOR_PICK
+    if (color.a < 0.005)   // matches 0/255 and 1/255
     {
         discard;
     }
-    
+#else
+#ifdef OPAQUE
+    if (color.a < 0.995)   // matches < 254/255
+    {
+        discard;
+    }
+#else
+    if (color.a >= 0.995)  // matches 254/255 and 255/255
+    {
+        discard;
+    }
+#endif
+#endif
+
 #ifdef RENDER_FOR_PICK
     gl_FragColor = v_pickColor;
 #else
